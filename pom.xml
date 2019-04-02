@@ -267,7 +267,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${env.FIJI_MOSAIC_PLUGIN_PATH}</outputDirectory>
+                            <outputDirectory>target/</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>target</directory>
