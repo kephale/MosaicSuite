@@ -223,16 +223,16 @@
         </dependency>
 
         <!-- These dependencies are temporarily kept in mosaic maven -->
-        <dependency>
-            <groupId>net.jgeom.nurbs</groupId>
-            <artifactId>net.jgeom.nurbs</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>cmaes</groupId>
-            <artifactId>cmaes</artifactId>
-            <version>1.0.0</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>net.jgeom.nurbs</groupId>-->
+            <!--<artifactId>net.jgeom.nurbs</artifactId>-->
+            <!--<version>1.0.0</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>cmaes</groupId>-->
+            <!--<artifactId>cmaes</artifactId>-->
+            <!--<version>1.0.0</version>-->
+        <!--</dependency>-->
     </dependencies>
 
     <build>
