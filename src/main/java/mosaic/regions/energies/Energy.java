@@ -20,7 +20,7 @@ public abstract class Energy {
     public void updateEnergy() { /*override if needed */}
     
     public static class EnergyResult {
-        EnergyResult(Double energy, Boolean merge) {
+        public EnergyResult(Double energy, Boolean merge) {
             this.energyDifference = energy;
             this.merge = merge;
         }
