@@ -48,6 +48,8 @@
         <package-name>mosaic</package-name>
         <license.licenseName>gpl_v3</license.licenseName>
         <license.copyrightOwners>MOSAIC group</license.copyrightOwners>
+
+	    <jgrapht-core.version>1.3.0</jgrapht-core.version>
     </properties>
     
     <developers>
@@ -87,7 +89,7 @@
     <parent>
         <groupId>org.scijava</groupId>
         <artifactId>pom-scijava</artifactId>
-        <version> 16.1.0</version>
+        <version>27.0.1</version>
         <relativePath />
     </parent>
 
@@ -173,8 +175,9 @@
             <artifactId>jsch</artifactId>
         </dependency>
         <dependency>
-            <groupId>net.sf.jgrapht</groupId>
-            <artifactId>jgrapht</artifactId>
+            <groupId>org.jgrapht</groupId>
+            <artifactId>jgrapht-core</artifactId>
+	    <version>${jgrapht-core.version}</version>
         </dependency>
         <dependency>
             <groupId>sc.fiji</groupId>

@@ -1,19 +1,17 @@
 package mosaic.utils.math;
 
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.alg.shortestpath.FloydWarshallShortestPaths;
+import org.jgrapht.alg.spanning.KruskalMinimumSpanningTree;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.DefaultUndirectedWeightedGraph;
+import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.SimpleGraph;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import org.jgrapht.Graph;
-import org.jgrapht.GraphPath;
-import org.jgrapht.UndirectedGraph;
-import org.jgrapht.WeightedGraph;
-import org.jgrapht.alg.FloydWarshallShortestPaths;
-import org.jgrapht.alg.KruskalMinimumSpanningTree;
-import org.jgrapht.graph.DefaultEdge;
-import org.jgrapht.graph.DefaultWeightedEdge;
-import org.jgrapht.graph.SimpleGraph;
-import org.jgrapht.graph.SimpleWeightedGraph;
 
 
 /**
@@ -110,9 +108,9 @@ public class GraphUtils {
      * @param aGraph graph to be "simplified"
      * @return weighted graph
      */
-    public static <V, E extends DefaultEdge> WeightedGraph<V, DefaultWeightedEdge> simplifySimipleUndirectedGraph(UndirectedGraph<V, E> aGraph) {
+    public static <V, E extends DefaultEdge> DefaultUndirectedWeightedGraph<V, DefaultWeightedEdge> simplifySimipleUndirectedGraph(DefaultUndirectedWeightedGraph<V, E> aGraph) {
         // Create new weighted graph which is same as input
-        WeightedGraph<V, DefaultWeightedEdge> weightedGraph = new SimpleWeightedGraph<V, DefaultWeightedEdge>(DefaultWeightedEdge.class);
+        DefaultUndirectedWeightedGraph<V, DefaultWeightedEdge> weightedGraph = new DefaultUndirectedWeightedGraph<V, DefaultWeightedEdge>(DefaultWeightedEdge.class);
         for (V v : aGraph.vertexSet()) weightedGraph.addVertex(v);
         for (E e : aGraph.edgeSet()) {
             DefaultWeightedEdge edge = weightedGraph.addEdge(aGraph.getEdgeSource(e), aGraph.getEdgeTarget(e));
@@ -158,19 +156,19 @@ public class GraphUtils {
         return weightedGraph;
     }
     
-    /**
-     * Runs MST and creates new graph with proper vertices and eges.
-     * @param aGraph input graph
-     * @return new MST graph
-     */
-    public static <V, E extends DefaultEdge> UndirectedGraph<V, E> minimumSpanningTree(Graph<V, E> aGraph) {
-        KruskalMinimumSpanningTree<V, E> mst = new KruskalMinimumSpanningTree<V, E>(aGraph);
-        UndirectedGraph<V, E> graphMst = new SimpleGraph<V, E>(aGraph.getEdgeFactory());
-        for (V v : aGraph.vertexSet()) graphMst.addVertex(v);
-        for (E e : mst.getEdgeSet()) graphMst.addEdge(aGraph.getEdgeSource(e), aGraph.getEdgeTarget(e));
-        
-        return graphMst;
-    }
+//    /**
+//     * Runs MST and creates new graph with proper vertices and eges.
+//     * @param aGraph input graph
+//     * @return new MST graph
+//     */
+//    public static <V, E extends DefaultEdge> DefaultUndirectedWeightedGraph<V, E> minimumSpanningTree(Graph<V, E> aGraph) {
+//        KruskalMinimumSpanningTree<V, E> mst = new KruskalMinimumSpanningTree<V, E>(aGraph);
+//        DefaultUndirectedWeightedGraph<V, DefaultEdge> graphMst = new DefaultUndirectedWeightedGraph<V, DefaultEdge>(DefaultEdge.class);
+//        for (V v : aGraph.vertexSet()) graphMst.addVertex(v);
+//        for (E e : mst.getSpanningTree().getEdges()) graphMst.addEdge(aGraph.getEdgeSource(e), aGraph.getEdgeTarget(e));
+//
+//        return (DefaultUndirectedWeightedGraph<V, E>) graphMst;// FIXME
+//    }
     
     /**
      * @param aPath
@@ -184,42 +182,42 @@ public class GraphUtils {
         return sum;
     }
     
-    /**
-     * @param aGraph
-     * @return longest shortest path for provided graph
-     */
-    public static<V, E extends DefaultEdge> GraphPath<V, E> findLongestShortestPath(Graph<V, E> aGraph) {
-        FloydWarshallShortestPaths<V, E> paths = new FloydWarshallShortestPaths<V, E>(aGraph);
-        
-        return findLongestShortestPath(paths);
-    }
-    
-    /**
-     * @param aPaths
-     * @return longest shortest path for all paths provided
-     */
-    private static <V, E extends DefaultEdge> GraphPath<V, E> findLongestShortestPath(FloydWarshallShortestPaths<V, E> aPaths) {
-        // Take any vertex as a starting point
-        V v = aPaths.getGraph().vertexSet().iterator().next();
-        GraphPath<V, E> longestPath = null;
-        
-        // Loop twice: first time to find longest path from initial vertex, and second for finding longest path 
-        // from previously found vertex. It will be the longest path in a set.
-        for (int i = 0; i < 2; i++) {
-            List<GraphPath<V, E>> shortestPaths = aPaths.getShortestPaths(v);
-            double len = -Double.MAX_VALUE;
-            for (GraphPath<V, E> p : shortestPaths) {
-                double w = getPathWeight(p);
-                if (w > len) {
-                    len = w;
-                    v = p.getEndVertex();
-                    longestPath = p;
-                }
-            }
-        }
-        
-        return longestPath;
-    }
+//    /**
+//     * @param aGraph
+//     * @return longest shortest path for provided graph
+//     */
+//    public static<V, E extends DefaultEdge> GraphPath<V, E> findLongestShortestPath(Graph<V, E> aGraph) {
+//        FloydWarshallShortestPaths<V, E> paths = new FloydWarshallShortestPaths<V, E>(aGraph);
+//
+//        return findLongestShortestPath(paths);
+//    }
+//
+//    /**
+//     * @param aPaths
+//     * @return longest shortest path for all paths provided
+//     */
+//    private static <V, E extends DefaultEdge> GraphPath<V, E> findLongestShortestPath(FloydWarshallShortestPaths<V, E> aPaths) {
+//        // Take any vertex as a starting point
+//        V v = aPaths.getGraph().vertexSet().iterator().next();
+//        GraphPath<V, E> longestPath = null;
+//
+//        // Loop twice: first time to find longest path from initial vertex, and second for finding longest path
+//        // from previously found vertex. It will be the longest path in a set.
+//        for (int i = 0; i < 2; i++) {
+//            List<GraphPath<V, E>> shortestPaths = aPaths.getShortestPaths(v);
+//            double len = -Double.MAX_VALUE;
+//            for (GraphPath<V, E> p : shortestPaths) {
+//                double w = getPathWeight(p);
+//                if (w > len) {
+//                    len = w;
+//                    v = p.getEndVertex();
+//                    longestPath = p;
+//                }
+//            }
+//        }
+//
+//        return longestPath;
+//    }
     
     /**
      * Crates graph from matrix considering every element != 0 as a graph vertex.
@@ -228,9 +226,9 @@ public class GraphUtils {
      * @param aIs8connected - connectivity
      * @return graphs created from provided matrix
      */
-    public static UndirectedGraph<IntVertex, DefaultEdge> matrixToGraph(Matrix aMatrix, boolean aIs8connected) {
+    public static DefaultUndirectedWeightedGraph<IntVertex, DefaultEdge> matrixToGraph(Matrix aMatrix, boolean aIs8connected) {
         List<List<Integer>> graphConnections = findAllElementsOfObject(aMatrix, aIs8connected);
-        UndirectedGraph<IntVertex, DefaultEdge> graph = new SimpleGraph<IntVertex, DefaultEdge>(DefaultEdge.class);
+        DefaultUndirectedWeightedGraph<IntVertex, DefaultEdge> graph = new DefaultUndirectedWeightedGraph<IntVertex, DefaultEdge>(DefaultEdge.class);
 
         for (int i = 0; i < graphConnections.size(); ++i) {
             int sourceVertexId = graphConnections.get(i).get(0);
