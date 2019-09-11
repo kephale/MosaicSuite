@@ -1,12 +1,5 @@
 package mosaic.utils.io.csv;
 
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
-
 import org.apache.log4j.Logger;
 import org.supercsv.cellprocessor.constraint.NotNull;
 import org.supercsv.cellprocessor.ift.CellProcessor;
@@ -15,11 +8,14 @@ import org.supercsv.io.CsvListReader;
 import org.supercsv.io.CsvListWriter;
 import org.supercsv.io.ICsvListReader;
 import org.supercsv.io.ICsvListWriter;
-import org.supercsv.io.dozer.CsvDozerBeanReader;
-import org.supercsv.io.dozer.CsvDozerBeanWriter;
-import org.supercsv.io.dozer.ICsvDozerBeanReader;
-import org.supercsv.io.dozer.ICsvDozerBeanWriter;
 import org.supercsv.prefs.CsvPreference;
+
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
 
 
 public class CSV<E> {
@@ -109,43 +105,9 @@ public class CSV<E> {
      * @return 
      */
     public int setCSVPreferenceFromFile(String aCsvFilename) {
-        ICsvDozerBeanReader beanReader = null;
+        //ICsvDozerBeanReader beanReader = null;
         int numOfColumns = 0;
-        try {
-            beanReader = new CsvDozerBeanReader(new FileReader(aCsvFilename), iCsvPreference);
 
-            final String[] map = beanReader.getHeader(true);
-            numOfColumns = map.length;
-            // In case when header map is equal to 1 it is probable that current delimiter is not correct
-            // Try to find better. (Of course there is always a chanse that there is only one column).
-            if (numOfColumns == 1) {
-                int tempNumOfColumns = map[0].split(";").length;
-                if (tempNumOfColumns > 1) {
-                    setDelimiter(';');
-                    numOfColumns = tempNumOfColumns;
-                }
-                else {
-                    tempNumOfColumns = map[0].split("\t").length;
-                    if (tempNumOfColumns > 1) {
-                        setDelimiter('\t');
-                        numOfColumns = tempNumOfColumns;
-                    }
-                }
-            }
-        }
-        catch (final IOException e) {
-            e.printStackTrace();
-        }
-        finally {
-            if (beanReader != null) {
-                try {
-                    beanReader.close();
-                } catch (final IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        
         return numOfColumns;
     }
 
@@ -163,7 +125,6 @@ public class CSV<E> {
      * Read a CSV file
      *
      * @param aCsvFilename - Name of the filename to open
-     * @param CsvColumnConfig - output choose with defined colum names and processors
      * @return container with values
      */
     public Vector<E> Read(String aCsvFilename, CsvColumnConfig aOutputChoose) {
@@ -174,7 +135,6 @@ public class CSV<E> {
      * Read a CSV file
      *
      * @param aCsvFilename - Name of the filename to open
-     * @param CsvColumnConfig - output choose with defined colum names and processors
      * @return container with values
      */
     public Vector<E> Read(String aCsvFilename, CsvColumnConfig aOutputChoose, boolean aSkipHeader) {
@@ -335,53 +295,9 @@ public class CSV<E> {
      * Read a CSV file
      *
      * @param aCsvFilename - CSV filename
-     * @param outSuffixesCluster output - container for output data (in case of any error it will be empty)
      * @param aOutputChoose - chosen output (if null, it will be generated from header)
      */
     private CsvColumnConfig readData(String aCsvFilename, Vector<E> aOutput, CsvColumnConfig aOutputChoose, boolean aSkipHeader) {
-        ICsvDozerBeanReader beanReader = null;
-        try {
-            logger.info("Reading file: [" + aCsvFilename + "]");
-            beanReader = new CsvDozerBeanReader(new FileReader(aCsvFilename), iCsvPreference);
-
-            if (!aSkipHeader) {
-                final String[] map = beanReader.getHeader(true);
-                if (map == null)
-                {
-                    return null; // we cannot get the header
-                }
-                if (aOutputChoose == null) {
-                    aOutputChoose = generateOutputChoose(map);
-                }
-            }
-            if (aOutputChoose == null) return null;
-            
-            beanReader.configureBeanMapping(iClazz, aOutputChoose.fieldMapping);
-
-            E element;
-            while ((element = beanReader.read(iClazz, aOutputChoose.cellProcessors)) != null) {
-                aOutput.add(element);
-            }
-            logger.info("Read " + aOutput.size() + " elements");
-
-        } 
-        catch (final IOException e) {
-            e.printStackTrace();
-            aOutput.clear();
-        } 
-        catch (final Exception e) {
-            e.printStackTrace();
-            aOutput.clear();
-        }
-        finally {
-            if (beanReader != null) {
-                try {
-                    beanReader.close();
-                } catch (final IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
 
         return aOutputChoose;
     }
@@ -392,51 +308,6 @@ public class CSV<E> {
             return false;
         }
 
-        ICsvDozerBeanWriter beanWriter = null;
-        try {
-            logger.info("Writing file: [" + aCsvFilename + "], append: " + aShouldAppend);
-            beanWriter = new CsvDozerBeanWriter(new FileWriter(aCsvFilename, aShouldAppend), iCsvPreference);
-            beanWriter.configureBeanMapping(iClazz, aOutputChoose.fieldMapping);
-
-            // write the header and meta information
-            if (aShouldAppend == false) {
-                beanWriter.writeHeader(aOutputChoose.fieldMapping);
-
-                // Write meta information
-                for (final CsvMetaInfo mi : iMetaInfos) {
-                    beanWriter.writeComment("%" + mi.parameter + ":" + mi.value);
-                }
-
-                // write read meta information if specified
-                for (final CsvMetaInfo mi : iMetaInfosRead) {
-                    beanWriter.writeComment("%" + mi.parameter + ":" + mi.value);
-                }
-            }
-
-            // write the beans
-            try {
-
-                for (final E element : aOutputData) {
-                    beanWriter.write(element, aOutputChoose.cellProcessors);
-                }
-
-            } catch (final SecurityException e) {
-                e.printStackTrace();
-            } catch (final IllegalArgumentException e) {
-                e.printStackTrace();
-            }
-
-        } catch (final IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (beanWriter != null) {
-                try {
-                    beanWriter.close();
-                } catch (final IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
         return true;
     }
 
